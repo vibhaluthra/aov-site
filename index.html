@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Atelier Vibha | Coming Soon</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Montserrat:wght@300;400&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      background: #fefaf6;
+      color: #3c2f2f;
+      font-family: 'Montserrat', sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      text-align: center;
+      padding: 1rem;
+    }
+    .container { max-width: 1000px; width: 100%; margin: auto; }
+    .logo { max-width: 300px; margin-bottom: 1rem auto; }
+    h1 { font-family: 'Playfair Display', serif; font-size: 2.4rem; margin-bottom: 1rem; letter-spacing: 1px; }
+    p { font-size: 1rem; margin-bottom: 2.5rem; }
+    .email-input {
+      padding: 0.6rem 1rem; font-size: 1rem; border: 1px solid #ccc; border-radius: 25px; width: 250px; margin-bottom: 1rem; outline: none;
+    }
+    .query-input {
+      padding: 0.6rem 1rem; font-size: 1rem; border: 1px solid #ccc; border-radius: 12px; width: 280px; height: 90px; margin-bottom: 1rem; outline: none; resize: vertical;
+    }
+    .notify-btn {
+      padding: 0.8rem 1rem; font-size: 1rem; background: #b99b72; color: white; border: none; border-radius: 30px; cursor: pointer; transition: background 0.3s ease; margin-bottom: 1rem;
+    }
+    .notify-btn[disabled] { opacity: 0.7; cursor: not-allowed; }
+    .notify-btn:hover { background: #a9885c; }
+    .social-section { display: flex; flex-direction: row; gap: 5rem; justify-content: center; flex-wrap: wrap; }
+    .social-pair { display: flex; flex-direction: column; align-items: center; gap: 0.2rem; }
+    .social-btn { background: #b99b72; color: white; padding: 0.6rem 1.2rem; border: none; border-radius: 25px; font-weight: 500; font-size: 1rem; cursor: pointer; transition: background 0.3s ease; }
+    .social-btn:hover { background: #a9885c; }
+    .social-pair img { width: 100px; height: 100px; margin-top: 0.5rem; }
+    footer { margin-top: 2rem; font-size: 0.9rem; color: #998; }
+    @media (max-width: 768px) { .social-section { flex-direction: column; gap: 2rem; } }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <img src="logo.png" alt="Atelier Vibha Logo" class="logo">
+    <h1>We're Designing Something Beautiful</h1>
+    <p>Our online experience is coming soon. Stay tuned for the elegance of Atelier of Vibha.</p>
+
+    <!-- Visible form -->
+    <form id="visibleForm">
+      <input type="email" class="email-input" id="email" name="email" placeholder="Enter your email" required />
+      <input type="email" class="email-input" id="query" name="query" placeholder="Enter your query" required />
+      <!--br-->
+      <!--textarea class="query-input" id="query" name="query" placeholder="Enter your query (optional)"></textarea-->
+      <!--br-->
+      <button type="submit" id="notifyBtn" class="notify-btn">Notify Me</button>
+    </form>
+
+    <div class="social-section">
+      <div class="social-pair">
+        <button class="social-btn" onclick="window.open('https://instagram.com/ateliervibha', '_blank')">Follow on Instagram</button>
+        <img src="instagram-qr.png" alt="Instagram QR">
+      </div>
+      <div class="social-pair">
+        <button class="social-btn" onclick="window.open('https://facebook.com/ateliervibha', '_blank')">Follow on Facebook</button>
+        <img src="facebook-qr.png" alt="Facebook QR">
+      </div>
+    </div>
+
+    <footer>&copy; 2025 Atelier Vibha. All rights reserved.</footer>
+  </div>
+
+  <!-- Hidden iframe + hidden form (posts to Google Forms endpoint) -->
+  <iframe name="hidden_iframe" id="hidden_iframe" style="display:none;"></iframe>
+
+  <form id="hiddenGoogleForm" action="https://docs.google.com/forms/d/e/1FAIpQLSfsP1E6OCRzt6Pcx7rnVAvLTAloGj1i3czzY5JDCzPFNgPSYA/formResponse" method="POST" target="hidden_iframe" style="display:none;">
+    <input type="hidden" name="entry.1674195837" id="hiddenEmail">
+    <input type="hidden" name="entry.1240407033" id="hiddenQuery">
+    <!-- optional: if you add a "Source / Page" question to your Form -->
+    <!-- <input type="hidden" name="entry.SOURCE_ID" id="hiddenSource"> -->
+  </form>
+
+  <script>
+    document.getElementById('visibleForm').addEventListener('submit', function (e) {
+      e.preventDefault();
+      submitEmail();
+    });
+
+    function submitEmail() {
+      const emailEl = document.getElementById('email');
+      const queryEl = document.getElementById('query');
+      const email = (emailEl.value || '').trim();
+      const query = (queryEl.value || '').trim();
+
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        alert('Please enter a valid email address.');
+        emailEl.focus();
+        return;
+      }
+
+      const submitBtn = document.getElementById('notifyBtn');
+      submitBtn.disabled = true;
+      const originalBtnText = submitBtn.innerText;
+      submitBtn.innerText = 'Sending...';
+
+      // fill hidden form
+      document.getElementById('hiddenEmail').value = email;
+      document.getElementById('hiddenQuery').value = query;
+
+      const iframe = document.getElementById('hidden_iframe');
+      const onIframeLoad = function () {
+        iframe.removeEventListener('load', onIframeLoad);
+        submitBtn.disabled = false;
+        submitBtn.innerText = originalBtnText;
+        alert('Thank you! We will notify you when we launch.');
+        emailEl.value = '';
+        queryEl.value = '';
+      };
+      iframe.addEventListener('load', onIframeLoad);
+
+      document.getElementById('hiddenGoogleForm').submit();
+    }
+  </script>
+</body>
+</html>
